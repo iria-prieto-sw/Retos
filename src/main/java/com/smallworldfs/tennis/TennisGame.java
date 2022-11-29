@@ -3,121 +3,92 @@ package com.smallworldfs.tennis;
 public class TennisGame
 
 {
+    public Player player1;
+    public Player player2;
+    public Player winning;
+    public Player losing;
 
-    public int P1point = 0;
-    public int P2point = 0;
-
-    public String P1res = "";
-    public String P2res = "";
-    private String player1Name;
-    private String player2Name;
+    public ResultEnum resultString;
 
     public TennisGame(String player1Name, String player2Name) {
-        this.player1Name = player1Name;
-        this.player2Name = player2Name;
+        player1= new Player(player1Name);
+        player2= new Player(player2Name);
     }
 
-    public String getScore() {
-        String score = "";
-        if (P1point == P2point && P1point < 4) {
-            if (P1point == 0)
-                score = "Love";
-            if (P1point == 1)
-                score = "Fifteen";
-            if (P1point == 2)
-                score = "Thirty";
-            score += "-All";
-        }
-        if (P1point == P2point && P1point >= 3)
-            score = "Deuce";
+    public void addScore(Player play) {
+        play.addTotalScore(1);
+    }
 
-        if (P1point > 0 && P2point == 0) {
-            if (P1point == 1)
-                P1res = "Fifteen";
-            if (P1point == 2)
-                P1res = "Thirty";
-            if (P1point == 3)
-                P1res = "Forty";
+    public String sameScore() {
+        String score="";
+        score= player1.getResString() + "-All";
+        return score;
+    }
 
-            P2res = "Love";
-            score = P1res + "-" + P2res;
+    public void determineSituation (Player player1, Player player2) {
+        if (player1.getTotalScore() > player2.getTotalScore()) {
+            winning= player1;
+            losing= player2;
+        } else {
+            winning= player2;
+            losing= player1;
         }
-        if (P2point > 0 && P1point == 0) {
-            if (P2point == 1)
-                P2res = "Fifteen";
-            if (P2point == 2)
-                P2res = "Thirty";
-            if (P2point == 3)
-                P2res = "Forty";
+    }
 
-            P1res = "Love";
-            score = P1res + "-" + P2res;
-        }
-
-        if (P1point > P2point && P1point < 4) {
-            if (P1point == 2)
-                P1res = "Thirty";
-            if (P1point == 3)
-                P1res = "Forty";
-            if (P2point == 1)
-                P2res = "Fifteen";
-            if (P2point == 2)
-                P2res = "Thirty";
-            score = P1res + "-" + P2res;
-        }
-        if (P2point > P1point && P2point < 4) {
-            if (P2point == 2)
-                P2res = "Thirty";
-            if (P2point == 3)
-                P2res = "Forty";
-            if (P1point == 1)
-                P1res = "Fifteen";
-            if (P1point == 2)
-                P1res = "Thirty";
-            score = P1res + "-" + P2res;
-        }
-
-        if (P1point > P2point && P2point >= 3) {
-            score = "Advantage player1";
-        }
-
-        if (P2point > P1point && P1point >= 3) {
-            score = "Advantage player2";
-        }
-
-        if (P1point >= 4 && P2point >= 0 && (P1point - P2point) >= 2) {
-            score = "Win for player1";
-        }
-        if (P2point >= 4 && P1point >= 0 && (P2point - P1point) >= 2) {
-            score = "Win for player2";
+    public String isGameStillGoingOn(Player winning, Player losing, String score) {
+        if ((winning.getTotalScore() > 0 && losing.getTotalScore() == 0)
+                || (losing.getTotalScore() > 0 && winning.getTotalScore() == 0)
+                || (winning.getTotalScore() > losing.getTotalScore() && winning.getTotalScore() < 4)
+                || (losing.getTotalScore() > winning.getTotalScore() && losing.getTotalScore() < 4)) {
+           return player1.getResString() + "-" + player2.getResString();
         }
         return score;
     }
 
-    public void SetP1Score(int number) {
-        for (int i = 0; i < number; i++) {
-            P1Score();
+    public String setAdvantage(Player winning, Player losing){
+        if (winning.getTotalScore() > losing.getTotalScore() && losing.getTotalScore() >= 3) {
+            return "Advantage ".concat(winning.getName()) ;
         }
+        return "";
     }
 
-    public void SetP2Score(int number) {
-        for (int i = 0; i < number; i++) {
-            P2Score();
+    public String setWin(Player winning, Player losing, String score){
+        if (isEndGameStage(winning, losing)
+                && winning.getTotalScore() >= 4 && losing.getTotalScore() >= 0
+                && (winning.getTotalScore() - losing.getTotalScore()) >= 2) {
+            return "Win for ".concat(winning.getName()) ;
         }
+        return score;
     }
 
-    public void P1Score() {
-        P1point++;
+    public boolean isEndGameStage(Player player, Player other) {
+        return player.getTotalScore() > 3 || other.getTotalScore() > 3 || (player.getTotalScore() == 3 && other.getTotalScore()  == 3);
     }
 
-    public void P2Score() {
-        P2point++;
+    public String getScore() {
+        String score = "";
+        int P1point = player1.getTotalScore();
+        int P2point = player2.getTotalScore();
+
+        if ((P1point == P2point && P1point < 4)) {
+            score+= sameScore();
+        }
+        if (P1point == P2point && P1point >= 3)
+            score = "Deuce";
+
+        score =  isGameStillGoingOn(winning, losing, score);
+
+        score =  score + setAdvantage(winning, losing);
+
+        score = setWin(winning, losing, score);
+
+        return score;
     }
 
     public void wonPoint(String player) {
         if (player == "player1")
-            P1Score();
+            addScore(player1);
         else
-            P2Score();
+           addScore(player2);
     }
 }
