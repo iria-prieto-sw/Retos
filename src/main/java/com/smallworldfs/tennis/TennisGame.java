@@ -8,8 +8,6 @@ public class TennisGame
     public Player winning;
     public Player losing;
 
-    public ResultEnum resultString;
-
     public TennisGame(String player1Name, String player2Name) {
         player1= new Player(player1Name);
         player2= new Player(player2Name);
@@ -20,7 +18,7 @@ public class TennisGame
     }
 
     public String sameScore() {
-        String score="";
+        String score;
         score= player1.getResString() + "-All";
         return score;
     }
@@ -87,7 +85,7 @@ public class TennisGame
     }
 
     public void wonPoint(String player) {
-        if (player == "player1")
+        if (player.equals("player1"))
             addScore(player1);
         else
            addScore(player2);
