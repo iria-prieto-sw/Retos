@@ -66,6 +66,7 @@ public class TennisGame
     }
 
     public String getScore() {
+        determineSituation (player1, player2);
         String score = "";
         int P1point = player1.getTotalScore();
         int P2point = player2.getTotalScore();
